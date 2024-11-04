@@ -89,9 +89,5 @@ void loop() {
           count_count++; // increases the count of the loop
           loopCount = 0; // resets the loop count
     }
-    if (count_count > testValsLen) { // 
-      fill_solid(leds, NUM_LEDS, CRGB::Red);
-          FastLED.show();
-    }
   }
 }
