@@ -4,12 +4,16 @@
 //#include <LiquidCrystal_I2C.h> // Inlucde the LCD library
 #include <Wire.h>  // For I2C communication
 #include <SPI.h>   // Include SPI library
-//#include <SD.h>                // Include the SD library
+#include <SD.h>                // Include the SD library
+#include <DS3231.h>
+#include <SD.h>
+
 #define NUM_LEDS 8    // Number of LEDs in the chain
 #define DATA_PIN 6    // Data pin for LED strip control
 #define BUTTON_PIN 2  // data pin for the button press
 #define LED_PIN 13    // data pin for the blinking led 
 
+File myFile;
 RTC_DS3231 rtc;
 
 CRGB leds[NUM_LEDS];  // Array to hold LED color data for the led strip
@@ -81,11 +85,13 @@ void loop() {
     loopCount++;              // counts the amount of times that the led has cycled/looped
     
     //will flash a purple light when the loop counting is the same as the values of the array
-    if (loopCount == testVals[count_count]) {
+    if (loopCount == myVals[count_count]) {
           fill_solid(leds, NUM_LEDS, CRGB::Purple);
           FastLED.show();
-          delay(l_delay*5);
+          delay(1000); // delay for a full second
           fill_solid(leds, NUM_LEDS, CRGB::Black);
+
+
           count_count++; // increases the count of the loop
           loopCount = 0; // resets the loop count
     }
