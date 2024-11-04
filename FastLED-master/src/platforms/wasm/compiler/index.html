@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>FastLED.js</title>
+
+    <link rel="stylesheet" href="index.css">
+    <!-- Include Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+    <h1>FastLED.js</h1>
+    <div id="main-container">
+        <div id="top-row">
+            <div id="canvas-container">
+                <canvas id="myCanvas" width="16" height="16"></canvas>
+            </div>
+            <div id="ui-controls"></div>
+        </div>
+        <pre id="output"></pre>
+    </div>
+
+</body>
+
+
+<!-- Include the FastLED script -->
+<script src="fastled.js"></script>
+<script src="index.js"></script>
+<script>
+    // load fastled when the window is loaded.
+    async function loadFastLed() {
+        // Load the FastLED module.
+        const options = {
+            canvasId: "myCanvas",
+            uiControlsId: "ui-controls",
+            printId: "output"
+        }
+        await globalThis.loadFastLED(options);
+    }
+
+    // Wait for fonts to load before showing content
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(function () {
+            document.body.style.opacity = 1;
+        });
+    } else {
+        // Fallback for browsers that do not support document.fonts
+        window.onload = function () {
+            document.body.style.opacity = 1;
+        };
+    }
+
+    window.addEventListener('load', loadFastLed);
+</script>
+
+
+</html>
