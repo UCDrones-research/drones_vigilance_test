@@ -22,11 +22,15 @@ bool dir = true;
 int dot = 0;
 
 // array that contains the actual vals used for the test. 
-const int myVals[] = {22, 22, 45, 60, 60, 30, 150, 30, 30, 60, 90, 300, 22, 22, 45, 60, 60, 30, 150, 30, 30, 60, 90, 300}; // the number of loops before interuption
-const int myValsLen = sizeof(myVals) / sizeof(myVals[0]); // gets the number of elements in myVals
+const int myVals[] = {22, 44, 89, 149, 209, 239, 389, 419, 449, 509, 599, 899, 921, 943, 988, 1048, 1108, 1138, 1288, 1318, 1348, 1408, 1498, 1798}; // the number of loops before interuption
+int myValsLen = sizeof(myVals) / sizeof(myVals[0]); // gets the number of elements in myVals
+
+// half test
+const int halfVals[] = {22, 44, 89, 149, 209, 239, 389, 419, 449, 509, 599, 899}; // the number of loops before interuption
+int halfValsLen = sizeof(halfVals) / sizeof(halfVals[0]); // gets the number of elements in myVals
 
 // testing values
-const int testVals[] = {3, 6, 10, 15}; // the number of loops before integration for an example
+const int testVals[] = {3, 6, 10, 15, 25}; // the number of loops before integration for an example
 int testValsLen = sizeof(testVals) / sizeof(testVals[0]); // number of elements in testVals
 
 // consistent blinking light variables
@@ -37,8 +41,7 @@ const long interval_led = 1000;  // interval at which to blink (milliseconds)
 const long interval_bln = 160;
 int i = 0;   // random variable for the initial animation
 
-String TestSubject = "tim"; //Not to exceed 3 char
-
+// String TestSubject = "kyr"; //Not to exceed 3 char
 
 void setup() { // setup
   Serial.begin(9600);
@@ -50,30 +53,6 @@ void setup() { // setup
   pinMode(BUTTON_PIN, INPUT);  // setting up the button
 
   digitalWrite(LED_PIN,LOW);
-// setting up the rtc
-/*
-  #ifndef ESP8266
-    while (!Serial); // wait for serial port to connect. Needed for native USB
-  #endif
-    if (! rtc.begin()) {
-      Serial.println("Couldn't find RTC");
-      Serial.flush();
-      while (1) delay(10);
-    }
-
-  if (rtc.lostPower()) {
-    Serial.println("RTC lost power, let's set the time!");
-    // When time needs to be set on a new device, or after a power loss, the
-    // following line sets the RTC to the date & time this sketch was compiled
-    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-    // This line sets the RTC with an explicit date & time, for example to set
-    // January 21, 2014 at 3am you would call:
-    // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
-  }
-  DateTime now = rtc.now(); // setting up the date and time
-  */
-  
-  
   
   // setting up the sd card initialization 
   if (!SD.begin(4)) {
@@ -90,9 +69,9 @@ void setup() { // setup
   }
 
   DateTime now = rtc.now(); // setting up the date and time
-
-  // setting up the sd card and file
-  filename = TestSubject+ String(now.hour())+"h" + String(now.minute()) + ".txt";
+  
+  filename = String(now.month()) + String(now.day()) + String(now.hour()) + String(now.minute()) + ".txt";
+  
   Serial.println(filename);
   //filename = "exmp12.txt";
   myFile = SD.open(filename, FILE_WRITE); 
@@ -103,9 +82,6 @@ void setup() { // setup
   } else {
     Serial.println("Didn't work");
   }
-
-  
-
 
   // setting up the initial animation
   for (int a=0; a<3; a++) { // led strip will flash 3 times before starting the test
@@ -130,9 +106,10 @@ void setup() { // setup
 }
 
 void loop() {
+  DateTime now = rtc.now(); // setting up the date and time
   
-  
-  unsigned long currentMillis = millis(); // setting up the constant blinking led 
+  // setting up the constant blinking led 
+  unsigned long currentMillis = millis(); 
 
   if (currentMillis - previousMillis_led >= interval_led) {
     // save the last time you blinked the LED
@@ -152,15 +129,18 @@ void loop() {
 
   //setting up the button press example
   if (digitalRead(BUTTON_PIN) == LOW) {  // if button is pressed
+    /*
     fill_solid(leds, NUM_LEDS, CRGB::Purple);
     FastLED.show();
     loopCount = 0; //Restarting the loop count
     count_count = 0;
     dot = 0;
+    dir = true;
+    */
+    NVIC_SystemReset(); // hard reset of the system
   }
 
   else { //if the button isn't pressed
-    
     
     // iterates over the lights in the led strip
     if (currentMillis - previousMillis_bln >= interval_bln) { 
@@ -179,11 +159,11 @@ void loop() {
     if (dir==true){ //move right to left
       dot = dot+1;
       if (dot==NUM_LEDS-1){
-        if (loopCount == testVals[count_count])
+        if (loopCount == halfVals[count_count])
         {
           dot = 0; //reset back to 0, so we continue moving right to left
           count_count = count_count + 1; //increment which test we're on
-          if (count_count == testValsLen){ // Reset count_count and loopCount to keep going indef
+          if (count_count == myValsLen){ // Reset count_count and loopCount to keep going indef
             count_count = 0;
             loopCount = 0;
             //DateTime now = rtc.now(); // setting up the date and time
@@ -205,7 +185,7 @@ void loop() {
         dir = true;
         loopCount = loopCount + 1; // completed a loop
         
-        String loop_out1 = "Loop: "+String(loopCount) + "/" + String(testVals[count_count]);
+        String loop_out1 = "Loop: " + String(loopCount) + "/" + String(myVals[count_count]);
         log_SD(loop_out1);
       }
     }
@@ -216,7 +196,7 @@ void loop() {
 
   /*
     //will flash a purple light when the loop counting is the same as the values of the array
-    if (loopCount == testVals[count_count]) {
+    if (loopCount == halfVals[count_count]) {
       fill_solid(leds, NUM_LEDS, CRGB::Purple);
       FastLED.show();
       delay(l_delay*5);
@@ -230,7 +210,7 @@ void loop() {
     }
 
     // closes the sd card file when there is no more elements in the array
-    if (count_count == testValsLen) { 
+    if (count_count == halfValsLen) { 
       // prints the time in which the test has ended
       myFile.println(String(now.year()) + "/" + String(now.month()) + "/" + String(now.day()) + " " + "--" + " " + String(now.hour()) + ":" + String(now.minute()) + ":" + String(now.second()) + " -- Test Finsished");
       Serial.println(String(now.year()) + "/" + String(now.month()) + "/" + String(now.day()) + " " + "--" + " " + String(now.hour()) + ":" + String(now.minute()) + ":" + String(now.second()) + " -- Test Finished");
@@ -241,7 +221,7 @@ void loop() {
   }
 }
 
-void log_SD(String message){
+void log_SD(String message){ // function to write within the sd card and the serial port
   myFile = SD.open(filename, FILE_WRITE);
   if (myFile) {
     Serial.println(message);
